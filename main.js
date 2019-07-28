@@ -22,7 +22,6 @@ let trig = [
                 ]
             },
             {
-                //tree.dragged = null;
                 "text": "NP", "trigChild": true, "children": [
                     { "text": "the book", "children": [] }
                 ]
@@ -65,6 +64,13 @@ let data = [
 
 let renderTarget = data;
 
+let svg = d3.select(".container");
+
+let drag = d3.drag()
+    .on("start", dragStarted)
+    .on("drag", dragged)
+    .on("end", dragEnded);
+
 genId(renderTarget);
 renderSVG(renderTarget);
 
@@ -72,7 +78,7 @@ function addNewChild(node) {
     node.trigChild = d3.event.shiftKey;
     node.children.push({ "text": "X", "children": [] });
 }
-function editText(node){
+function editText(node) {
     let boundingRect = document.getElementById(node.id).getBoundingClientRect();
     let activeInput = d3.select('#textEdit')
         .append("input")
@@ -112,9 +118,9 @@ function toggleTrash() {
 
 function renderSVG(renderTarget) {
     let arrayForRender = flatten(renderTarget);
-    renderNodes(".container", arrayForRender);
+    renderNodes(svg, arrayForRender);
     let connectors = generateConnectors(arrayForRender);
-    renderConnectors(".container", connectors);
+    renderConnectors(svg, connectors);
     d3.selectAll("text").on("click", (node) => {
         if (d3.select("#trashCan").classed("trash-open")) {
             console.log(node);
@@ -125,7 +131,7 @@ function renderSVG(renderTarget) {
         }
         genId(renderTarget);
         renderSVG(renderTarget);
-        editText(_.last(node.children));
+        //editText(_.last(node.children));
     })
         .on("contextmenu", function (node) {
             console.log(node);
@@ -135,18 +141,22 @@ function renderSVG(renderTarget) {
 }
 
 function genId(tree, prefix = "n") {
-    let nodeCount = 0;
     let leafCount = 0;
+    let nodeCount = 0;
     function recursive(subtree, depth, self) {
         subtree.forEach((item, index, arr) => {
             if (item.children.length == 0) {
                 arr[index]["x"] = leafCount * nodeGapX;
                 leafCount++;
             }
+
+            //if (!("id" in item)) {
             arr[index].id = prefix + nodeCount;
+            arr[index].nid = nodeCount;
+            nodeCount++;
+            //}
             arr[index].parent = self;
             arr[index].y = depth * 40;
-            nodeCount++;
             recursive(item.children, depth + 1, item);
         });
     }
@@ -176,19 +186,24 @@ function flatten(renderTarget) {
         });
     }
     recurse(renderTarget);
-    return oneDimensionArr;
+    //return oneDimensionArr.sort((a, b) => (a.nid - b.nid));
+    return oneDimensionArr
 }
 
-function renderNodes(parent, dataArray) {
-    let text = d3.select(parent)
+function renderNodes(svg, dataArray) {
+    let text = svg
         .selectAll("text")
         .data(dataArray)
-        .attr("id", d => d.id)
-        .text(d => d.text)
+        .call(drag)
+
+    /*      .transition()
+         .duration(500).attr("id", d => d.id) */
+    text.text(d => d.text)
         .attr("x", d => d.x + offsetX)
         .attr("y", d => d.y + offsetY)
         .attr("text-anchor", "middle")
         .style("font-size", fontSize);
+
 
     text.enter()
         .append("text")
@@ -198,6 +213,7 @@ function renderNodes(parent, dataArray) {
         .attr("y", d => d.y + offsetY)
         .attr("text-anchor", "middle")
         .style("font-size", fontSize);
+
     text.exit().remove();
 }
 function generateConnectors(dataArrayFlat) {
@@ -234,10 +250,14 @@ function generateConnectors(dataArrayFlat) {
     });
     return connectors;
 }
-function renderConnectors(parent, connectors) {
-    let line = d3.select(parent)
+function renderConnectors(svg, connectors) {
+    let line = svg
         .selectAll("line")
         .data(connectors.filter(connector => connector.trig == false))
+
+    /* .transition()
+    .duration(500) */
+    line
         .attr("x1", x => x["x1"] + offsetX)
         .attr("y1", x => x["y1"] + offsetY + offsetConnectorTop)
         .attr("x2", x => x["x2"] + offsetX)
@@ -248,13 +268,17 @@ function renderConnectors(parent, connectors) {
         .append("line")
         .attr("x1", x => x["x1"] + offsetX)
         .attr("y1", x => x["y1"] + offsetY + offsetConnectorTop)
+        .attr("x2", x => x["x1"] + offsetX)
+        .attr("y2", x => x["y1"] + offsetY + offsetConnectorTop)
+        /*         .transition()
+                .duration(500) */
         .attr("x2", x => x["x2"] + offsetX)
         .attr("y2", x => x["y2"] + offsetY - fontSize - offsetConnectorBottom)
         .style("stroke-width", "1")
         .style("stroke", "rgb(0,0,0)")
     line.exit().remove();
     //<polygon points="200,10 250,190 160,210" style="fill:lime;stroke:purple;stroke-width:1" />
-    let polygon = d3.select(parent)
+    let polygon = svg
         .selectAll("polygon")
         .data(connectors.filter(connector => connector.trig == true))
         .attr("points", x => `${x.x1 + offsetX},${x.y1 + offsetY + offsetConnectorTop} ${x.x2 + offsetX},${x.y2 + offsetY - offsetConnectorBottom - fontSize} ${x.x3 + offsetX},${x.y3 + offsetY - offsetConnectorBottom - fontSize}`)
@@ -273,4 +297,34 @@ function renderConnectors(parent, connectors) {
 function removeNode(node) {
     _.remove(node.parent.children, child => child.id == node.id)
 }
- 
+
+let nodesDOMElements;
+let nodesToBeMove;
+
+function dragStarted(node) {
+    d3.event.sourceEvent.stopPropagation();
+    d3.select(this).classed("dragging", true);
+    nodesToBeMoved = flatten([node]);
+    console.log("nodesToBeMoved is");
+    console.log(nodesToBeMoved);
+    nodesDOMElements = _.map(nodesToBeMoved, (node) => document.getElementById(node.id));
+}
+
+function dragged(node) {
+
+    d3.selectAll(nodesDOMElements)
+        .data(nodesToBeMoved)
+        .attr("x", (thisNode) => {
+            let xDiff = node.x - thisNode.x;
+            return d3.event.x - xDiff + offsetX;
+        })
+        .attr("y", (thisNode) => {
+            let yDiff = node.y - thisNode.y;
+            return d3.event.y - yDiff + offsetY;
+        });
+}
+
+function dragEnded(node) {
+    d3.select(this).classed("dragging", false);
+}
+
