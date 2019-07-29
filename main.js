@@ -71,6 +71,10 @@ let drag = d3.drag()
     .on("drag", dragged)
     .on("end", dragEnded);
 
+//global variables
+let connectors = [];
+let nodes = [];
+
 genId(renderTarget);
 renderSVG(renderTarget);
 
@@ -117,9 +121,9 @@ function toggleTrash() {
 }
 
 function renderSVG(renderTarget) {
-    let arrayForRender = flatten(renderTarget);
-    renderNodes(svg, arrayForRender);
-    let connectors = generateConnectors(arrayForRender);
+    nodes = flatten(renderTarget);
+    renderNodes(svg, nodes);
+    connectors = generateConnectors(nodes);
     renderConnectors(svg, connectors);
     d3.selectAll("text").on("click", (node) => {
         if (d3.select("#trashCan").classed("trash-open")) {
@@ -140,6 +144,7 @@ function renderSVG(renderTarget) {
         });
 }
 
+//generate ID for each node
 function genId(tree, prefix = "n") {
     let leafCount = 0;
     let nodeCount = 0;
@@ -186,7 +191,6 @@ function flatten(renderTarget) {
         });
     }
     recurse(renderTarget);
-    //return oneDimensionArr.sort((a, b) => (a.nid - b.nid));
     return oneDimensionArr
 }
 
@@ -195,14 +199,11 @@ function renderNodes(svg, dataArray) {
         .selectAll("text")
         .data(dataArray)
         .call(drag)
-
-    /*      .transition()
-         .duration(500).attr("id", d => d.id) */
     text.text(d => d.text)
         .attr("x", d => d.x + offsetX)
         .attr("y", d => d.y + offsetY)
         .attr("text-anchor", "middle")
-        .style("font-size", fontSize);
+        .style("font-size", fontSize + 'px');
 
 
     text.enter()
@@ -212,12 +213,22 @@ function renderNodes(svg, dataArray) {
         .attr("x", d => d.x + offsetX)
         .attr("y", d => d.y + offsetY)
         .attr("text-anchor", "middle")
-        .style("font-size", fontSize);
+        .style("font-size", fontSize + 'px');
 
     text.exit().remove();
 }
+function generateConnectorsToBeMoved(dataArrayFlat) {
+    let dataIds = _.map(dataArrayFlat, (data) => data.id);
+    console.log(dataIds);
+    let connectorsToBeMoved = _.filter(connectors, (connector) => {
+        return dataIds.includes(connector.parent);
+    });
+    return connectorsToBeMoved;
+}
+
 function generateConnectors(dataArrayFlat) {
     let connectors = [];
+    let connectorCount = 0;
     dataArrayFlat.forEach(parent => {
         parent.children.forEach(child => {
             if (parent.trigChild) {
@@ -231,6 +242,8 @@ function generateConnectors(dataArrayFlat) {
                         "y2": child.y,
                         "x3": child.x + halfChildTextWidth,
                         "y3": child.y,
+                        "id": "c" + connectorCount,
+                        "parent": parent.id
                     }
                 );
             }
@@ -241,10 +254,13 @@ function generateConnectors(dataArrayFlat) {
                         "x1": parent.x,
                         "y1": parent.y,
                         "x2": child.x,
-                        "y2": child.y
+                        "y2": child.y,
+                        "id": "c" + connectorCount,
+                        "parent": parent.id
                     }
                 );
             }
+            connectorCount++;
         }
         );
     });
@@ -255,8 +271,6 @@ function renderConnectors(svg, connectors) {
         .selectAll("line")
         .data(connectors.filter(connector => connector.trig == false))
 
-    /* .transition()
-    .duration(500) */
     line
         .attr("x1", x => x["x1"] + offsetX)
         .attr("y1", x => x["y1"] + offsetY + offsetConnectorTop)
@@ -264,6 +278,7 @@ function renderConnectors(svg, connectors) {
         .attr("y2", x => x["y2"] + offsetY - fontSize - offsetConnectorBottom)
         .style("stroke-width", "1")
         .style("stroke", "rgb(0,0,0)")
+        .attr("id", x => x.id)
     line.enter()
         .append("line")
         .attr("x1", x => x["x1"] + offsetX)
@@ -276,6 +291,7 @@ function renderConnectors(svg, connectors) {
         .attr("y2", x => x["y2"] + offsetY - fontSize - offsetConnectorBottom)
         .style("stroke-width", "1")
         .style("stroke", "rgb(0,0,0)")
+        .attr("id", x => x.id)
     line.exit().remove();
     //<polygon points="200,10 250,190 160,210" style="fill:lime;stroke:purple;stroke-width:1" />
     let polygon = svg
@@ -285,12 +301,14 @@ function renderConnectors(svg, connectors) {
         .style("stroke-width", "1")
         .style("fill", "white")
         .style("stroke", "black")
+        .attr("id", x => x.id)
     polygon.enter()
         .append("polygon")
         .attr("points", x => `${x.x1 + offsetX},${x.y1 + offsetY + offsetConnectorTop} ${x.x2 + offsetX},${x.y2 + offsetY - offsetConnectorBottom - fontSize} ${x.x3 + offsetX},${x.y3 + offsetY - offsetConnectorBottom - fontSize}`)
         .style("stroke-width", "1")
         .style("fill", "white")
         .style("stroke", "black")
+        .attr("id", x => x.id)
     polygon.exit().remove();
 }
 
@@ -298,20 +316,43 @@ function removeNode(node) {
     _.remove(node.parent.children, child => child.id == node.id)
 }
 
+//variables for drag()
 let nodesDOMElements;
-let nodesToBeMove;
-
+let nodesToBeMoved;
+let connectorsToBeMoved;
+let connectorsDOMElements;
+let nodesNotMoved;
 function dragStarted(node) {
+    if(!node.parent) return;
     d3.event.sourceEvent.stopPropagation();
     d3.select(this).classed("dragging", true);
     nodesToBeMoved = flatten([node]);
-    console.log("nodesToBeMoved is");
-    console.log(nodesToBeMoved);
+    connectorsToBeMoved = generateConnectorsToBeMoved(nodesToBeMoved);
+    console.log(connectorsToBeMoved);
     nodesDOMElements = _.map(nodesToBeMoved, (node) => document.getElementById(node.id));
+    connectorsDOMElements = _.map(connectorsToBeMoved, (connector) => document.getElementById(connector.id));
+
+    nodesNotMoved = _.filter(nodes, (node) => {
+        return !nodesToBeMoved.includes(node);
+    });
+
 }
 
 function dragged(node) {
+    if(!node.parent) return;
 
+    let snapTarget = _.find(nodesNotMoved, (node) => {
+        let distance = Math.sqrt(Math.pow(node.x - d3.event.x, 2) + Math.pow(node.y - d3.event.y, 2));
+        return distance < 10; //minimum distance to snap
+    });
+    if (snapTarget) {
+        d3.select('#' + snapTarget.id)
+        .style("font-size", '20px')
+    }
+    else{
+        d3.selectAll('text')
+        .style("font-size", fontSize+'px')
+    }
     d3.selectAll(nodesDOMElements)
         .data(nodesToBeMoved)
         .attr("x", (thisNode) => {
@@ -322,9 +363,44 @@ function dragged(node) {
             let yDiff = node.y - thisNode.y;
             return d3.event.y - yDiff + offsetY;
         });
+
+    d3.selectAll(connectorsDOMElements)
+        .data(connectorsToBeMoved)
+        .attr("x1", (thisConnector) => {
+            let xDiff = node.x - thisConnector.x1;
+            return d3.event.x - xDiff + offsetX;
+        })
+        .attr("y1", (thisConnector) => {
+            let yDiff = node.y - thisConnector.y1;
+            return d3.event.y - yDiff + offsetY + offsetConnectorTop;
+        })
+        .attr("x2", (thisConnector) => {
+            let xDiff = node.x - thisConnector.x2;
+            return d3.event.x - xDiff + offsetX;
+        })
+        .attr("y2", (thisConnector) => {
+            let yDiff = node.y - thisConnector.y2;
+            return d3.event.y - yDiff + offsetY - fontSize - offsetConnectorBottom;
+        })
+
 }
 
 function dragEnded(node) {
+    if(!node.parent) return;
+
     d3.select(this).classed("dragging", false);
+    let switchTarget = _.find(nodesNotMoved, (node) => {
+        let distance = Math.sqrt(Math.pow(node.x - d3.event.x, 2) + Math.pow(node.y - d3.event.y, 2));
+        return distance < 10; //minimum distance to snap
+    });
+    console.log("drag ended at:");
+    console.log(switchTarget);
+    switchTargetIndex = _.indexOf(switchTarget.parent.children, switchTarget);
+    nodeIndex = _.indexOf(node.parent.children, node);
+    switchTarget.parent.children[switchTargetIndex] = node;
+    node.parent.children[nodeIndex] = switchTarget;
+    [node.parent, switchTarget.parent] = [switchTarget.parent, node.parent];
+    genId(renderTarget);
+    renderSVG(renderTarget);
 }
 
