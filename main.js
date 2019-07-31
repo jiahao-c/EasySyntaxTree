@@ -1,4 +1,5 @@
 //TO-DO: custom font, custom connector height, custom node gap,custorm margin
+//TO-DO: export to json
 
 let nodeGapX = 50;
 let offsetX = 40;
@@ -13,58 +14,63 @@ let template = [
     }
 ];
 
-let trig = [
+let example = [
     {
-        "text": "VP", "children": [
+        "text": "TP", "children": [
             {
-                "text": "V", "children": [
-                    { "text": "put", "children": [] }
+                "text": "NP", "children": [
+                    {"text": "Det", "children": [
+                        {"text": "a", "children": []}
+                    ] },
+                    { "text": "N", "children": [
+                        {"text": "linguist", "children": []}
+                    ] }
                 ]
             },
             {
-                "text": "NP", "trigChild": true, "children": [
-                    { "text": "the book", "children": [] }
-                ]
-            },
-        ]
-    }
-];
-
-let data = [
-    {
-        "text": "CP", "children": [
-            {
-                "text": "C", "children": [
-                    { "text": "T", "children": [{ "text": "might", "children": [] }] },
-                    { "text": "+Q", "children": [] }
-                ]
-            },
-            {
-                "text": "TP", "children": [
+                "text": "T'", "children": [
                     {
-                        "text": "NP", "children": [
+                        "text": "T", "children": [
                             {
-                                "text": "Det", "children": [
-                                    { "text": "that", "children": [] }
-                                ]
-                            },
-                            {
-                                "text": "N", "children": [
-                                    { "text": "player", "children": [] }
-                                ]
+                                "text": "+Pst", "children": []
                             }
                         ]
                     },
-                    { "text": "T'", "children": [] },
+                    { "text": "VP", "children": [
+                        { "text": "V", "children": [
+                            { "text": "walked", "children": [
+                            
+                            ] },
+                        ] },
+                        { "text": "PP", "children": [
+                            { "text": "P", "children": [
+                                { "text": "into", "children": [
+                            
+                                ] }
+                            ] },
+                            { "text": "NP", "children": [
+                                { "text": "Det", "children": [
+                                    { "text": "a", "children": [
+                            
+                                    ] }
+                                ] },
+                                { "text": "N", "children": [
+                                    { "text": "bar", "children": [
+                            
+                                    ] }
+                                ] }
+                            ] }
+                        ] }
+                    ] },
                 ]
             }
         ]
     }
 ];
 
-let renderTarget = data;
+let renderTarget = example;
 
-let svg = d3.select(".container");
+let svg = d3.select(".svg-container");
 
 let drag = d3.drag()
     .on("start", dragStarted)
@@ -75,8 +81,8 @@ let drag = d3.drag()
 let connectors = [];
 let nodes = [];
 
-genId(renderTarget);
-renderSVG(renderTarget);
+let newSize = genId(renderTarget);
+renderSVG(renderTarget, newSize);
 
 function addNewChild(node) {
     node.trigChild = d3.event.shiftKey;
@@ -96,7 +102,7 @@ function editText(node) {
         .style("top", boundingRect.top + "px")
         .on("keypress", (item, index, element) => { //Press space to finish editing
             if (d3.event.keyCode === 32 || d3.event.keyCode === 13) {
-                console.log(node);
+
                 node.text = element[0].value;
                 renderSVG(renderTarget);
                 element[0].remove();
@@ -106,7 +112,6 @@ function editText(node) {
     //Click elsewhere to finish editing
     let input = d3.selectAll("input");
     d3.select("body").on("click", () => {
-        console.log("clicked");
         let outsideInput = input.filter(() => this == d3.event.target).empty();
         if (outsideInput) {
             node.text = activeInput.node().value;
@@ -120,38 +125,50 @@ function toggleTrash() {
         .classed("trash-open", !d3.select("#trashCan").classed("trash-open"))
 }
 
-function renderSVG(renderTarget) {
+function renderSVG(renderTarget, size) {
     nodes = flatten(renderTarget);
+
+    if (size) {
+        svg
+            .style("width", size[0] + "px")
+            .style("height", size[1] + "px");
+    }
     renderNodes(svg, nodes);
     connectors = generateConnectors(nodes);
     renderConnectors(svg, connectors);
     d3.selectAll("text").on("click", (node) => {
         if (d3.select("#trashCan").classed("trash-open")) {
-            console.log(node);
             removeNode(node);
         }
         else {
+            if(node.children.length == 2) return;
             addNewChild(node);
         }
-        genId(renderTarget);
-        renderSVG(renderTarget);
+
+        let newSize = genId(renderTarget);
+        renderSVG(renderTarget, newSize);
         //editText(_.last(node.children));
     })
         .on("contextmenu", function (node) {
-            console.log(node);
+
             d3.event.preventDefault();
             editText(node);
         });
+
+
+
 }
 
 //generate ID for each node
 function genId(tree, prefix = "n") {
     let leafCount = 0;
     let nodeCount = 0;
+    let maxX = 0, maxY = 0;
     function recursive(subtree, depth, self) {
         subtree.forEach((item, index, arr) => {
             if (item.children.length == 0) {
                 arr[index]["x"] = leafCount * nodeGapX;
+                maxX = (arr[index]["x"] > maxX) ? arr[index]["x"] : maxX;
                 leafCount++;
             }
 
@@ -162,6 +179,7 @@ function genId(tree, prefix = "n") {
             //}
             arr[index].parent = self;
             arr[index].y = depth * 40;
+            maxY = (arr[index].y > maxY) ? arr[index].y : maxY;
             recursive(item.children, depth + 1, item);
         });
     }
@@ -181,6 +199,7 @@ function genId(tree, prefix = "n") {
 
     recursive(tree, 0);
     computeX(tree[0]);
+    return [maxX + 2 * offsetX, maxY + 2 * offsetY];
 }
 function flatten(renderTarget) {
     let oneDimensionArr = [];
@@ -205,7 +224,6 @@ function renderNodes(svg, dataArray) {
         .attr("text-anchor", "middle")
         .style("font-size", fontSize + 'px');
 
-
     text.enter()
         .append("text")
         .call(drag)
@@ -220,7 +238,7 @@ function renderNodes(svg, dataArray) {
 }
 function generateConnectorsToBeMoved(dataArrayFlat) {
     let dataIds = _.map(dataArrayFlat, (data) => data.id);
-    console.log(dataIds);
+
     let connectorsToBeMoved = _.filter(connectors, (connector) => {
         return dataIds.includes(connector.parent);
     });
@@ -329,7 +347,7 @@ function dragStarted(node) {
     d3.select(this).classed("dragging", true);
     nodesToBeMoved = flatten([node]);
     connectorsToBeMoved = generateConnectorsToBeMoved(nodesToBeMoved);
-    console.log(connectorsToBeMoved);
+
     nodesDOMElements = _.map(nodesToBeMoved, (node) => document.getElementById(node.id));
     connectorsDOMElements = _.map(connectorsToBeMoved, (connector) => document.getElementById(connector.id));
 
@@ -394,19 +412,73 @@ function dragEnded(node) {
         let distance = Math.sqrt(Math.pow(node.x - d3.event.x, 2) + Math.pow(node.y - d3.event.y, 2));
         return distance < 10; //minimum distance to snap
     });
-    if (!switchTarget || !switchTarget.parent) {
-        console.log("did not snap, go back");
-    }
-    else {
-        console.log("drag ended at:");
-        console.log(switchTarget);
+    if (switchTarget && switchTarget.parent) {
         switchTargetIndex = _.indexOf(switchTarget.parent.children, switchTarget);
         nodeIndex = _.indexOf(node.parent.children, node);
         switchTarget.parent.children[switchTargetIndex] = node;
         node.parent.children[nodeIndex] = switchTarget;
         [node.parent, switchTarget.parent] = [switchTarget.parent, node.parent];
     }
-    genId(renderTarget);
-    renderSVG(renderTarget);
+    let newSize = genId(renderTarget);
+    renderSVG(renderTarget, newSize);
+}
+function exportToSVG() {
+    let url = URL.createObjectURL(newSVGBlob());
+    //let url = "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(source);
+    let downloadLink = document.createElement("a");
+    downloadLink.href = url;
+    downloadLink.download = "export.svg";
+    downloadLink.click();
+}
+function exportToPNG(transparent) {
+    let url = window.URL.createObjectURL(newSVGBlob());
+    let image = new Image();
+    image.src = url;
+    let canvas = document.createElement("canvas"),
+        context = canvas.getContext("2d");
+
+    size = genId(renderTarget);
+    canvas.height = size[1];
+    canvas.width = size[0];
+
+    if (!transparent) {
+        context.fillStyle = 'white';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    image.onload = function () {
+        context.drawImage(image, 0, 0);
+        let downloadLink = document.createElement("a");
+        downloadLink.download = "export.png";
+        downloadLink.href = canvas.toDataURL("image/png");
+        downloadLink.click();
+    };
+
+
 }
 
+function newSVGBlob() {
+    let source = (new XMLSerializer()).serializeToString(svg.node());
+    if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+        source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+    }
+    if (!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)) {
+        source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+    }
+    source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+    return new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+}
+
+function alertPNG(){
+    $('#alertPNG').modal('show');
+}
+
+function showHelp(){
+    $('#help').modal('show');
+}
+
+function clearEverything(){
+    renderTarget = template;
+    let newSize = genId(renderTarget);
+    renderSVG(renderTarget, newSize);
+}

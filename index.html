@@ -2,22 +2,23 @@
 <html>
 
 <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css"
+        integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
+    <!--icons-->
+
     <title>EasySyntaxTree</title>
     <style>
         body {
             font-family: Arial;
-            height: 100vh;
         }
 
-        .container {
-            height: 500px;
-            width: 500px;
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            margin: auto;
+        .svg-container {
             user-select: none;
             /* supported by Chrome and Opera */
             -webkit-user-select: none;
@@ -28,8 +29,8 @@
             /* Firefox */
             -ms-user-select: none;
             /* Internet Explorer/Edge */
-            border:1px solid #ccc;
-            border-radius:16px;
+            border: 1px solid #ccc;
+            border-radius: 16px;
 
         }
 
@@ -47,19 +48,176 @@
 </head>
 
 <body>
-    <div>
-        <!--contenteditable="true"-->
-        <svg id="trashCan" onclick="toggleTrash()" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
-            viewBox="0 -50 268.476 268.476" style="height: 30px; width: 20px" class="">
-            <path class="trash-lid" xmlns="http://www.w3.org/2000/svg"
-                style="fill-rule:evenodd;clip-rule:evenodd;transform-origin: 240px 50px;transition: 0.2s ease-in;"
-                d="M218.36,35.811h-39.376V17.899C178.984,4.322,174.593,0,161.086,0L107.39,0C95.001,0,89.492,6.001,89.492,17.899v17.913H50.116   c-7.914,0-14.319,6.007-14.319,13.43c0,7.424,6.405,13.431,14.319,13.431H218.36c7.914,0,14.319-6.007,14.319-13.431   C232.679,41.819,226.274,35.811,218.36,35.811z M161.086,35.811h-53.695l0.001-17.913h53.695V35.811z" />
-            <path style="fill-rule:evenodd;clip-rule:evenodd;"
-                d="M63.119,250.254c0,0,3.999,18.222,24.583,18.222h93.072   c20.583,0,24.582-18.222,24.582-18.222l18.374-178.66H44.746L63.119,250.254z M170.035,98.442c0-4.943,4.006-8.949,8.949-8.949   c4.943,0,8.95,4.006,8.95,8.949l-8.95,134.238c0,4.943-4.007,8.949-8.949,8.949c-4.942,0-8.949-4.007-8.949-8.949L170.035,98.442z    M125.289,98.442c0-4.943,4.007-8.949,8.949-8.949c4.943,0,8.949,4.006,8.949,8.949v134.238c0,4.943-4.006,8.949-8.949,8.949   c-4.943,0-8.949-4.007-8.949-8.949V98.442z M89.492,89.492c4.943,0,8.949,4.006,8.949,8.949l8.95,134.238   c0,4.943-4.007,8.949-8.95,8.949c-4.942,0-8.949-4.007-8.949-8.949L80.543,98.442C80.543,93.499,84.55,89.492,89.492,89.492z    " />
-        </svg>
-        <div id="textEdit"> </div>
-        <svg class="container"></svg>
+    <div class="modal fade" id="help" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">How to Use</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <ul>
+                        <li> <svg version="1.1" xmlns="http://www.w3.org/2000/svg"
+                                xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="50px" height="50px"
+                                viewBox="0 0 417.031 417.031" style="enable-background:new 0 0 417.031 417.031;"
+                                xml:space="preserve">
+                                    <path transform="scale(-1, 1) translate(-400, 0)"
+                                        d="M219.683,92.146c-0.279-0.315-0.52-0.627-0.849-0.925c-3.644-3.272-3.742-2.306,0.247-5.983
+                               c2.955-2.712,6.541-4.834,9.79-7.18c8.596-6.213,14.254-14.534,18.079-24.399c8.582-22.15-16.706-37.453-29.396-50.562
+                               c-9.168-9.485-23.603,4.982-14.444,14.447c7.076,7.325,16.19,13.264,22.349,21.407c6.897,9.116-3.613,19.174-10.814,24.249
+                               c-11.133,7.844-20.757,18.262-18.533,29.434c-49.964,4.668-96.16,32.052-96.16,80.327v135.51
+                               c0,59.862,48.698,108.562,108.564,108.562c59.863,0,108.566-48.7,108.566-108.562V172.95
+                               C317.085,120.247,268.05,94.723,219.683,92.146z M120.391,172.95c0-35.833,38.898-56.581,79.186-60.027v124.982
+                               c-36.751-1.85-66.589-10.222-79.186-14.309V172.95z M296.648,308.461c0,48.604-39.537,88.133-88.129,88.133
+                               c-48.59,0-88.128-39.529-88.128-88.133V245.08c18.249,5.516,52.6,13.882,93.202,13.882c26.003,0,54.556-3.479,83.056-13.286
+                               V308.461z M296.648,223.94c-25.844,9.883-52.237,13.746-76.635,14.271v-125.59c39.407,2.363,76.635,21.264,76.635,60.337V223.94z
+                                M289.735,216.203c0,0-46.688,13.073-62.567,10.271V122.813C269.429,130.753,296.625,143.533,289.735,216.203z" />
+                               
+                            </svg>To add a new node, left-click (Primary Click)</li>
+                        <li>
+                                <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
+                                xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="50px" height="50px"
+                                viewBox="0 0 417.031 417.031" style="enable-background:new 0 0 417.031 417.031;"
+                                xml:space="preserve">
+                                    <path  d="M219.683,92.146c-0.279-0.315-0.52-0.627-0.849-0.925c-3.644-3.272-3.742-2.306,0.247-5.983
+                               c2.955-2.712,6.541-4.834,9.79-7.18c8.596-6.213,14.254-14.534,18.079-24.399c8.582-22.15-16.706-37.453-29.396-50.562
+                               c-9.168-9.485-23.603,4.982-14.444,14.447c7.076,7.325,16.19,13.264,22.349,21.407c6.897,9.116-3.613,19.174-10.814,24.249
+                               c-11.133,7.844-20.757,18.262-18.533,29.434c-49.964,4.668-96.16,32.052-96.16,80.327v135.51
+                               c0,59.862,48.698,108.562,108.564,108.562c59.863,0,108.566-48.7,108.566-108.562V172.95
+                               C317.085,120.247,268.05,94.723,219.683,92.146z M120.391,172.95c0-35.833,38.898-56.581,79.186-60.027v124.982
+                               c-36.751-1.85-66.589-10.222-79.186-14.309V172.95z M296.648,308.461c0,48.604-39.537,88.133-88.129,88.133
+                               c-48.59,0-88.128-39.529-88.128-88.133V245.08c18.249,5.516,52.6,13.882,93.202,13.882c26.003,0,54.556-3.479,83.056-13.286
+                               V308.461z M296.648,223.94c-25.844,9.883-52.237,13.746-76.635,14.271v-125.59c39.407,2.363,76.635,21.264,76.635,60.337V223.94z
+                                M289.735,216.203c0,0-46.688,13.073-62.567,10.271V122.813C269.429,130.753,296.625,143.533,289.735,216.203z" />
+                               
+                            </svg>To edit an existing node, right-click (Secondary Click)
+                        </li>
+                        <li><svg version="1.1" id="Capa_1" width="50px" height="50px" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                            viewBox="0 0 399.07 399.07" style="enable-background:new 0 0 399.07 399.07;" xml:space="preserve">
+                           <path d="M365.083,74.011L348.113,57.04c-3.906-3.904-10.236-3.904-14.143,0c-3.873,3.873-3.899,10.129-0.091,14.042h-22.365
+                               c-5.522,0-10,4.477-10,10c0,5.523,4.478,10,10,10h22.365c-3.809,3.913-3.782,10.169,0.091,14.042
+                               c1.953,1.952,4.512,2.929,7.071,2.929c2.56,0,5.118-0.977,7.071-2.929l16.971-16.971C368.988,84.248,368.988,77.916,365.083,74.011
+                               z"/>
+                           <path d="M225.747,105.124c1.953,1.952,4.512,2.929,7.071,2.929c2.56,0,5.118-0.977,7.071-2.929
+                               c3.873-3.873,3.899-10.129,0.091-14.042h22.365c5.522,0,10-4.477,10-10c0-5.523-4.478-10-10-10h-22.365
+                               c3.809-3.913,3.782-10.169-0.091-14.042c-3.906-3.904-10.236-3.904-14.143,0l-16.971,16.971c-3.905,3.905-3.905,10.237,0,14.143
+                               L225.747,105.124z"/>
+                           <path d="M286.93,95.666c-5.522,0-10,4.477-10,10v22.365c-3.913-3.809-10.168-3.782-14.042,0.091
+                               c-3.905,3.905-3.905,10.237,0,14.143l16.971,16.971c1.953,1.953,4.512,2.929,7.071,2.929c2.56,0,5.118-0.976,7.071-2.929
+                               l16.971-16.971c3.905-3.905,3.905-10.237,0-14.143c-3.874-3.873-10.129-3.9-14.042-0.091v-22.365
+                               C296.93,100.143,292.452,95.666,286.93,95.666z"/>
+                           <path d="M276.93,34.133v22.365c0,5.523,4.478,10,10,10c5.522,0,10-4.477,10-10V34.133c1.94,1.889,4.453,2.838,6.971,2.838
+                               c2.56,0,5.118-0.976,7.071-2.929c3.905-3.905,3.905-10.237,0-14.143L294.001,2.929c-3.906-3.905-10.236-3.905-14.142,0
+                               L262.888,19.9c-3.905,3.905-3.905,10.237,0,14.143C266.762,37.915,273.017,37.942,276.93,34.133z"/>
+                           <path d="M276.403,184.847c-5.572,0-11.22,1.072-16.508,3.065c-7.351-14.431-22.344-24.338-39.604-24.338
+                               c-6.152,0-12.015,1.166-17.344,3.271c-7.494-14.005-22.274-23.558-39.244-23.558c-4.251,0-8.414,0.594-12.394,1.743
+                               c0.004-4.974,0.008-10.103,0.012-15.225l0.028-39.856c0.008-10.637,0.011-15.562-0.033-18.109h0.043
+                               c0-22.711-19.849-41.188-44.246-41.188c-24.521,0-44.471,19.95-44.471,44.472v135.569c-16.375,5.479-30.83,20.593-31.436,42.169
+                               c-0.949,33.752,1.816,76.462,31.893,107.396c25.391,26.114,65.127,38.809,121.482,38.809c50.684,0,88.169-14.909,111.414-44.311
+                               c16.326-20.651,24.955-48.48,24.955-80.48l-0.078-44.995C320.873,204.797,300.924,184.847,276.403,184.847z M184.582,379.07
+                               c-119.311,0-135.217-60.478-133.383-125.644c0.441-15.717,13.953-25,25-25v28.823c0,3.625,2.514,4.047,3.264,4.047
+                               s3.18-0.412,3.18-4.038c0-3.499,0-182.132,0-182.132c0-13.515,10.955-24.472,24.471-24.472c12.402,0,24.246,8.881,24.246,21.188
+                               c0.008,0.045-0.064,89.86-0.076,111.957c-0.002,0.046-0.014,0.089-0.014,0.135v4.617c0,2.201,1.785,3.985,3.986,3.985
+                               c2.199,0,3.984-1.784,3.984-3.985v-1.194c0.217-13.328,11.082-24.067,24.463-24.067c13.514,0,24.473,10.957,24.473,24.473
+                               l0.018,17.721c0,2.168,1.758,3.925,3.926,3.925c2.166,0,3.924-1.757,3.924-3.925l-0.008-1.014
+                               c0-12.305,11.955-20.894,24.256-20.894c13.516,0,24.422,10.956,24.422,24.472l0.049,17.937c0,2.109,1.709,3.819,3.818,3.819
+                               c2.109,0,3.818-1.71,3.818-3.819l-0.014-1.365c0-11.19,12.109-19.771,24.018-19.771c13.514,0,24.471,10.957,24.471,24.472
+                               l0.078,44.96C300.951,316.094,284.69,379.07,184.582,379.07z"/>
+        
+                       </svg>To move a node, drag it on top of another node
+                       </li>
+                       <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268.476 268.476" style="height: 40px; width: 40px" class="">
+                                <path fill="black" xmlns="http://www.w3.org/2000/svg" d="M218.36,35.811h-39.376V17.899C178.984,4.322,174.593,0,161.086,0L107.39,0C95.001,0,89.492,6.001,89.492,17.899v17.913H50.116   c-7.914,0-14.319,6.007-14.319,13.43c0,7.424,6.405,13.431,14.319,13.431H218.36c7.914,0,14.319-6.007,14.319-13.431   C232.679,41.819,226.274,35.811,218.36,35.811z M161.086,35.811h-53.695l0.001-17.913h53.695V35.811z"></path>
+                                <path fill="black" d="M63.119,250.254c0,0,3.999,18.222,24.583,18.222h93.072   c20.583,0,24.582-18.222,24.582-18.222l18.374-178.66H44.746L63.119,250.254z M170.035,98.442c0-4.943,4.006-8.949,8.949-8.949   c4.943,0,8.95,4.006,8.95,8.949l-8.95,134.238c0,4.943-4.007,8.949-8.949,8.949c-4.942,0-8.949-4.007-8.949-8.949L170.035,98.442z    M125.289,98.442c0-4.943,4.007-8.949,8.949-8.949c4.943,0,8.949,4.006,8.949,8.949v134.238c0,4.943-4.006,8.949-8.949,8.949   c-4.943,0-8.949-4.007-8.949-8.949V98.442z M89.492,89.492c4.943,0,8.949,4.006,8.949,8.949l8.95,134.238   c0,4.943-4.007,8.949-8.95,8.949c-4.942,0-8.949-4.007-8.949-8.949L80.543,98.442C80.543,93.499,84.55,89.492,89.492,89.492z    "></path>
+                            </svg>
+                    To delete nodes, click trashcan, then click on a node
+                </li>
+                <li><svg width="40px" height="40px" viewBox="0 0 105 105"> <polygon stroke="black" stroke-width="10" fill="white" points="50,0 100,100 0,100" > </svg>
+                To add a triangle child, press and hold <kbd>shift</kbd> while clicking on a node
+                </li>
+                <li>
+                    To draw a movement...<a href="https://github.com/jhcccc/EasySyntaxTree">fork on Github</a> to help develop this feature
+                    </li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="exportToPNG(false)">Download
+                        Anyway</button>
+                    <button type="button" class="btn btn-secondary" onclick="exportToPNG(true)">Download Anyway
+                        (transparent)</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">I'll Take a Screenshot
+                        &#128526;</button>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <div class="modal fade" id="alertPNG" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Want High Quality Image?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    The quality of canvas-generated PNG is limited.<br>You may:
+                    <ul>
+                        <li>Zoom in and take a <b>screenshot</b> of the syntax tree to get
+                            a higher quality image. </li>
+                        <li>
+                            Use <b>SVG</b> (Vector Graphic) instead
+                        </li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="exportToPNG(false)">Download
+                        Anyway</button>
+                    <button type="button" class="btn btn-secondary" onclick="exportToPNG(true)">Download Anyway
+                        (transparent)</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">I'll Take a Screenshot
+                        &#128526;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="btn-group m-3" role="group" aria-label="Basic example">
+        <button onclick="showHelp();" type="button" class="btn btn-lg btn-secondary"><i class="fa fa-question"
+                aria-hidden="true"></i></button>
+        <button type="button" class="btn btn-lg btn-secondary" onclick="toggleTrash()"> <svg id="trashCan"
+                xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 -50 268.476 268.476"
+                style="height: 30px; width: 20px" class="">
+                <path fill="white" class="trash-lid" xmlns="http://www.w3.org/2000/svg"
+                    style="transform-origin: 240px 50px;transition: 0.2s ease-in;"
+                    d="M218.36,35.811h-39.376V17.899C178.984,4.322,174.593,0,161.086,0L107.39,0C95.001,0,89.492,6.001,89.492,17.899v17.913H50.116   c-7.914,0-14.319,6.007-14.319,13.43c0,7.424,6.405,13.431,14.319,13.431H218.36c7.914,0,14.319-6.007,14.319-13.431   C232.679,41.819,226.274,35.811,218.36,35.811z M161.086,35.811h-53.695l0.001-17.913h53.695V35.811z" />
+                <path fill="white"
+                    d="M63.119,250.254c0,0,3.999,18.222,24.583,18.222h93.072   c20.583,0,24.582-18.222,24.582-18.222l18.374-178.66H44.746L63.119,250.254z M170.035,98.442c0-4.943,4.006-8.949,8.949-8.949   c4.943,0,8.95,4.006,8.95,8.949l-8.95,134.238c0,4.943-4.007,8.949-8.949,8.949c-4.942,0-8.949-4.007-8.949-8.949L170.035,98.442z    M125.289,98.442c0-4.943,4.007-8.949,8.949-8.949c4.943,0,8.949,4.006,8.949,8.949v134.238c0,4.943-4.006,8.949-8.949,8.949   c-4.943,0-8.949-4.007-8.949-8.949V98.442z M89.492,89.492c4.943,0,8.949,4.006,8.949,8.949l8.95,134.238   c0,4.943-4.007,8.949-8.95,8.949c-4.942,0-8.949-4.007-8.949-8.949L80.543,98.442C80.543,93.499,84.55,89.492,89.492,89.492z    " />
+            </svg></button>
+        <button onclick="clearEverything()" type="button" class="btn btn-lg btn-secondary"><i class="fa fa-times" aria-hidden="true"></i></button>
+        <div class="dropdown-menu" aria-labelledby="exportButton">
+            <a class="dropdown-item" href="javascript:exportToSVG();">SVG (recommended)</a>
+            <a class="dropdown-item" href="javascript:alertPNG();">PNG</a>
+        </div>
+        <button type="button" class="btn btn-lg btn-secondary" id="exportButton" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false"><i class="fa fa-download" aria-hidden="true"></i></button>
+    </div>
+
+
+
+    <div id="textEdit"> </div>
+    <svg class="svg-container m-3"></svg>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.slim.min.js"
+        integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.15.0/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
+        integrity="sha256-CjSoeELFOcH0/uxWu6mC/Vlrc1AARqbm/jiiImDGV3s=" crossorigin="anonymous"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/d3@5.9.7/dist/d3.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"
         integrity="sha256-VeNaFBVDhoX3H+gJ37DpT/nTuZTdjYro9yBruHjVmoQ=" crossorigin="anonymous"></script>
