@@ -208,6 +208,7 @@ function renderNodes(svg, dataArray) {
 
     text.enter()
         .append("text")
+        .call(drag)
         .attr("id", d => d.id)
         .text(d => d.text)
         .attr("x", d => d.x + offsetX)
@@ -323,7 +324,7 @@ let connectorsToBeMoved;
 let connectorsDOMElements;
 let nodesNotMoved;
 function dragStarted(node) {
-    if(!node.parent) return;
+    if (!node.parent) return;
     d3.event.sourceEvent.stopPropagation();
     d3.select(this).classed("dragging", true);
     nodesToBeMoved = flatten([node]);
@@ -339,7 +340,7 @@ function dragStarted(node) {
 }
 
 function dragged(node) {
-    if(!node.parent) return;
+    if (!node.parent) return;
 
     let snapTarget = _.find(nodesNotMoved, (node) => {
         let distance = Math.sqrt(Math.pow(node.x - d3.event.x, 2) + Math.pow(node.y - d3.event.y, 2));
@@ -347,11 +348,11 @@ function dragged(node) {
     });
     if (snapTarget) {
         d3.select('#' + snapTarget.id)
-        .style("font-size", '20px')
+            .style("font-size", '20px')
     }
-    else{
+    else {
         d3.selectAll('text')
-        .style("font-size", fontSize+'px')
+            .style("font-size", fontSize + 'px')
     }
     d3.selectAll(nodesDOMElements)
         .data(nodesToBeMoved)
@@ -386,20 +387,25 @@ function dragged(node) {
 }
 
 function dragEnded(node) {
-    if(!node.parent) return;
+    if (!node.parent) return;
 
     d3.select(this).classed("dragging", false);
     let switchTarget = _.find(nodesNotMoved, (node) => {
         let distance = Math.sqrt(Math.pow(node.x - d3.event.x, 2) + Math.pow(node.y - d3.event.y, 2));
         return distance < 10; //minimum distance to snap
     });
-    console.log("drag ended at:");
-    console.log(switchTarget);
-    switchTargetIndex = _.indexOf(switchTarget.parent.children, switchTarget);
-    nodeIndex = _.indexOf(node.parent.children, node);
-    switchTarget.parent.children[switchTargetIndex] = node;
-    node.parent.children[nodeIndex] = switchTarget;
-    [node.parent, switchTarget.parent] = [switchTarget.parent, node.parent];
+    if (!switchTarget || !switchTarget.parent) {
+        console.log("did not snap, go back");
+    }
+    else {
+        console.log("drag ended at:");
+        console.log(switchTarget);
+        switchTargetIndex = _.indexOf(switchTarget.parent.children, switchTarget);
+        nodeIndex = _.indexOf(node.parent.children, node);
+        switchTarget.parent.children[switchTargetIndex] = node;
+        node.parent.children[nodeIndex] = switchTarget;
+        [node.parent, switchTarget.parent] = [switchTarget.parent, node.parent];
+    }
     genId(renderTarget);
     renderSVG(renderTarget);
 }
