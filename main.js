@@ -19,12 +19,16 @@ let example = [
         "text": "TP", "children": [
             {
                 "text": "NP", "children": [
-                    {"text": "Det", "children": [
-                        {"text": "a", "children": []}
-                    ] },
-                    { "text": "N", "children": [
-                        {"text": "linguist", "children": []}
-                    ] }
+                    {
+                        "text": "Det", "children": [
+                            { "text": "a", "children": [] }
+                        ]
+                    },
+                    {
+                        "text": "N", "children": [
+                            { "text": "linguist", "children": [] }
+                        ]
+                    }
                 ]
             },
             {
@@ -36,32 +40,54 @@ let example = [
                             }
                         ]
                     },
-                    { "text": "VP", "children": [
-                        { "text": "V", "children": [
-                            { "text": "walked", "children": [
-                            
-                            ] },
-                        ] },
-                        { "text": "PP", "children": [
-                            { "text": "P", "children": [
-                                { "text": "into", "children": [
-                            
-                                ] }
-                            ] },
-                            { "text": "NP", "children": [
-                                { "text": "Det", "children": [
-                                    { "text": "a", "children": [
-                            
-                                    ] }
-                                ] },
-                                { "text": "N", "children": [
-                                    { "text": "bar", "children": [
-                            
-                                    ] }
-                                ] }
-                            ] }
-                        ] }
-                    ] },
+                    {
+                        "text": "VP", "children": [
+                            {
+                                "text": "V", "children": [
+                                    {
+                                        "text": "walked", "children": [
+
+                                        ]
+                                    },
+                                ]
+                            },
+                            {
+                                "text": "PP", "children": [
+                                    {
+                                        "text": "P", "children": [
+                                            {
+                                                "text": "into", "children": [
+
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "text": "NP", "children": [
+                                            {
+                                                "text": "Det", "children": [
+                                                    {
+                                                        "text": "a", "children": [
+
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "text": "N", "children": [
+                                                    {
+                                                        "text": "bar", "children": [
+
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
                 ]
             }
         ]
@@ -100,6 +126,7 @@ function editText(node) {
         .style("font-size", fontSize + "px")
         .style("left", boundingRect.left + "px")
         .style("top", boundingRect.top + "px")
+        .style("width", "80px")
         .on("keypress", (item, index, element) => { //Press space to finish editing
             if (d3.event.keyCode === 32 || d3.event.keyCode === 13) {
 
@@ -141,7 +168,7 @@ function renderSVG(renderTarget, size) {
             removeNode(node);
         }
         else {
-            if(node.children.length == 2) return;
+            if (node.children.length == 2) return;
             addNewChild(node);
         }
 
@@ -382,26 +409,22 @@ function dragged(node) {
             let yDiff = node.y - thisNode.y;
             return d3.event.y - yDiff + offsetY;
         });
-
-    d3.selectAll(connectorsDOMElements)
-        .data(connectorsToBeMoved)
-        .attr("x1", (thisConnector) => {
-            let xDiff = node.x - thisConnector.x1;
-            return d3.event.x - xDiff + offsetX;
-        })
-        .attr("y1", (thisConnector) => {
-            let yDiff = node.y - thisConnector.y1;
-            return d3.event.y - yDiff + offsetY + offsetConnectorTop;
-        })
-        .attr("x2", (thisConnector) => {
-            let xDiff = node.x - thisConnector.x2;
-            return d3.event.x - xDiff + offsetX;
-        })
-        .attr("y2", (thisConnector) => {
-            let yDiff = node.y - thisConnector.y2;
-            return d3.event.y - yDiff + offsetY - fontSize - offsetConnectorBottom;
-        })
-
+    
+    let moveOffsetX = d3.event.x - node.x;
+    let moveOffsetY = d3.event.y - node.y;
+    
+    d3.selectAll(connectorsDOMElements.filter(connector => connector.tagName == 'line'))
+        .data(connectorsToBeMoved.filter(connector => connector.trig == false))
+        .attr("x1", (thisConnector) => moveOffsetX +thisConnector.x1 + offsetX)
+        .attr("y1", (thisConnector) => moveOffsetY + thisConnector.y1 + offsetY + offsetConnectorTop)
+        .attr("x2", (thisConnector) => moveOffsetX +thisConnector.x2 + offsetX)
+        .attr("y2", (thisConnector) => moveOffsetY + thisConnector.y2 + offsetY - fontSize - offsetConnectorBottom);
+    d3.selectAll(connectorsDOMElements.filter(connector => connector.tagName == 'polygon'))
+        .data(connectorsToBeMoved.filter(connector => connector.trig == true))
+        .attr("points", x => {
+            return `${x.x1 + offsetX + moveOffsetX}, ${x.y1 + offsetY + offsetConnectorTop + moveOffsetY} 
+        ${x.x2 + offsetX + moveOffsetX}, ${x.y2 + offsetY - offsetConnectorBottom - fontSize + moveOffsetY}
+        ${x.x3 + offsetX + moveOffsetX}, ${x.y3 + offsetY - offsetConnectorBottom - fontSize + moveOffsetY}`})
 }
 
 function dragEnded(node) {
@@ -469,15 +492,15 @@ function newSVGBlob() {
     return new Blob([source], { type: "image/svg+xml;charset=utf-8" });
 }
 
-function alertPNG(){
+function alertPNG() {
     $('#alertPNG').modal('show');
 }
 
-function showHelp(){
+function showHelp() {
     $('#help').modal('show');
 }
 
-function clearEverything(){
+function clearEverything() {
     renderTarget = template;
     let newSize = genId(renderTarget);
     renderSVG(renderTarget, newSize);
