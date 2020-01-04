@@ -8,10 +8,9 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!--icons-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css"
         integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-    <!--icons-->
-
     <title>EasySyntaxTree</title>
     <style>
         body {
@@ -173,9 +172,9 @@
                     </ul>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="exportToPNG(false)">Download
+                    <button type="button" class="btn btn-secondary" id='PNGfalse'>Download
                         Anyway</button>
-                    <button type="button" class="btn btn-secondary" onclick="exportToPNG(true)">Download Anyway
+                    <button type="button" class="btn btn-secondary" id='PNGtrue'>Download Anyway
                         (transparent)</button>
                     <button type="button" class="btn btn-primary" data-dismiss="modal">I'll Take a Screenshot
                         &#128526;</button>
@@ -186,7 +185,7 @@
     <div class="btn-group m-3" role="group" aria-label="Basic example">
         <button onclick="showHelp();" type="button" class="btn btn-lg btn-secondary"><i class="fa fa-question"
                 aria-hidden="true"></i></button>
-        <button type="button" class="btn btn-lg btn-secondary" onclick="toggleTrash()"> <svg id="trashCan"
+        <button type="button" class="btn btn-lg btn-secondary" id='trash'> <svg id="trashCan"
                 xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 -50 268.476 268.476"
                 style="height: 30px; width: 20px" class="">
                 <path fill="white" class="trash-lid" xmlns="http://www.w3.org/2000/svg"
@@ -195,10 +194,10 @@
                 <path fill="white"
                     d="M63.119,250.254c0,0,3.999,18.222,24.583,18.222h93.072   c20.583,0,24.582-18.222,24.582-18.222l18.374-178.66H44.746L63.119,250.254z M170.035,98.442c0-4.943,4.006-8.949,8.949-8.949   c4.943,0,8.95,4.006,8.95,8.949l-8.95,134.238c0,4.943-4.007,8.949-8.949,8.949c-4.942,0-8.949-4.007-8.949-8.949L170.035,98.442z    M125.289,98.442c0-4.943,4.007-8.949,8.949-8.949c4.943,0,8.949,4.006,8.949,8.949v134.238c0,4.943-4.006,8.949-8.949,8.949   c-4.943,0-8.949-4.007-8.949-8.949V98.442z M89.492,89.492c4.943,0,8.949,4.006,8.949,8.949l8.95,134.238   c0,4.943-4.007,8.949-8.95,8.949c-4.942,0-8.949-4.007-8.949-8.949L80.543,98.442C80.543,93.499,84.55,89.492,89.492,89.492z    " />
             </svg></button>
-        <button onclick="clearEverything()" type="button" class="btn btn-lg btn-secondary"><i class="fa fa-times" aria-hidden="true"></i></button>
+        <button id='clear' type="button" class="btn btn-lg btn-secondary"><i class="fa fa-times" aria-hidden="true"></i></button>
         <div class="dropdown-menu" aria-labelledby="exportButton">
-            <a class="dropdown-item" href="javascript:exportToSVG();">SVG (recommended)</a>
-            <a class="dropdown-item" href="javascript:alertPNG();">PNG</a>
+            <a class="dropdown-item" id='svg'>SVG (recommended)</a>
+            <a class="dropdown-item" id='png'>PNG</a>
         </div>
         <button type="button" class="btn btn-lg btn-secondary" id="exportButton" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false"><i class="fa fa-download" aria-hidden="true"></i></button>
@@ -217,7 +216,7 @@
     <script src="https://cdn.jsdelivr.net/npm/d3@5.9.7/dist/d3.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"
         integrity="sha256-VeNaFBVDhoX3H+gJ37DpT/nTuZTdjYro9yBruHjVmoQ=" crossorigin="anonymous"></script>
-    <script src="main.js"></script>
+    <script src="main.js" type="module"></script>
 </body>
 
 </html>
