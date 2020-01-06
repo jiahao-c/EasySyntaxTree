@@ -19,4 +19,3 @@ While there are a few GUI programs such as [TreeForm](http://www.mapsofspeech.co
 - Vertor graphics, crystal-clear image
 - Easy export to SVG and PNG
 
-## How to Use
