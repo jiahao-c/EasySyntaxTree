@@ -1,12 +1,12 @@
 //TO-DO: custom font, custom connector height, custom node gap,custorm margin
 //TO-DO: export to json
-import '/modules/draw.js';
+import './modules/draw.js';
 import { renderTarget, 
     renderSVG,
     genId,
     exportToSVG,
     exportToPNG,
-    clearEverything} from '/modules/draw.js';
+    clearEverything} from './modules/draw.js';
 let newSize = genId(renderTarget);
 renderSVG(renderTarget, newSize);
 
