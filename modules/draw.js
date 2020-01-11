@@ -1,4 +1,5 @@
 import {template, example} from '/modules/example.js';
+import {template, example} from './example.js';
 //global variables
 let connectors = [];
 let nodes = [];

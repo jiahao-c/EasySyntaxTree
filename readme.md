@@ -1,5 +1,6 @@
 # Easy Syntax Tree
-Easy Syntax Tree is an web tool to create linguistic syntax tree easily, interactively. 
+Easy Syntax Tree is an web tool to create linguistic syntax tree easily, interactively.
+(What You See Is What You Get.)
 
 [Try it here](https://jhcccc.github.io/EasySyntaxTree/) **This project is still in development.** Important features like drawing movements is yet to be implemented. **Pull requests are more than welcomed.**
 
@@ -18,4 +19,3 @@ While there are a few GUI programs such as [TreeForm](http://www.mapsofspeech.co
 - Vertor graphics, crystal-clear image
 - Easy export to SVG and PNG
 
-## How to Use
