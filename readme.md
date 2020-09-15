@@ -2,7 +2,9 @@
 Easy Syntax Tree is an web tool to create linguistic syntax tree easily, interactively.
 (What You See Is What You Get.)
 
-[Try it here](https://jhcccc.github.io/EasySyntaxTree/) **This project is still in development.** Important features like drawing movements is yet to be implemented. **Pull requests are more than welcomed.**
+[Try it here](https://jiahao-c.github.io/EasySyntaxTree/) **This project is still in development.** Important features like drawing movements is yet to be implemented.
+
+**Pull requests are more than welcomed.**
 
 ![demo](https://cdn.jsdelivr.net/gh/jhcccc/EasySyntaxTree@master/img/tree.png)
 ![usage](https://cdn.jsdelivr.net/gh/jhcccc/EasySyntaxTree@master/img/usage.png)
