@@ -1,8 +1,12 @@
+# :yum: Sep 2020 Update
+I am working on a new version of Easy Syntax Tree. The new version will support important features like drawing movement, and undo/redo. The new versions uses React, TypeScript. I'll post an update here as soon as I complete new Easy Syntax Tree. 
+You can take a peak [here](https://codesandbox.io/s/estv2-visx-un7v1).
+
 # Easy Syntax Tree
 Easy Syntax Tree is an web tool to create linguistic syntax tree easily, interactively.
 (What You See Is What You Get.)
 
-[Try it here](https://jiahao-c.github.io/EasySyntaxTree/) **This project is still in development.** Important features like drawing movements is yet to be implemented.
+Try it [here](https://jiahao-c.github.io/EasySyntaxTree/) **This project is still in development.** Important features like drawing movements is yet to be implemented.
 
 **Pull requests are more than welcomed.**
 
