@@ -1,6 +1,6 @@
 # :yum: Sep 2020 Update
 I am working on a new version of Easy Syntax Tree. The new version will support important features like drawing movement, and undo/redo. The new versions uses React, TypeScript, and all the best techonlogies available. I'll post an update here as soon as I complete new Easy Syntax Tree. 
-You can take a peak [here](https://codesandbox.io/s/estv2-6zkkg).
+You can take a peak [here](https://github.com/jiahao-c/easysyntaxtree-v2).
 ![image](https://user-images.githubusercontent.com/8275280/99036678-17023780-25bd-11eb-9270-6d9e3e10d30c.png)
 
 
